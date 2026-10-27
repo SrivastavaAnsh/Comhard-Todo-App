@@ -14,7 +14,7 @@ export const INITIAL_TASKS = [
     priority: "Urgent",
     createdAt: "2026-10-22T08:30:00Z",
     dueDate: "2026-10-28T18:00:00Z",
-    slaHours: 24,
+    slaHours: 12,
     timeSpent: {
       todo: 28800,       // 8 hours
       inProgress: 14400, // 4 hours
@@ -29,11 +29,11 @@ export const INITIAL_TASKS = [
     priority: "High",
     createdAt: "2026-10-18T10:00:00Z",
     dueDate: "2026-10-25T17:00:00Z",
-    slaHours: 48,
+    slaHours: 16,
     timeSpent: {
       todo: 18000,       // 5 hours
       inProgress: 32400, // 9 hours
-      done: 7200         // 2 hours post-review
+      done: 0            // 0 hours
     }
   },
   {
@@ -44,7 +44,7 @@ export const INITIAL_TASKS = [
     priority: "High",
     createdAt: "2026-10-24T11:15:00Z",
     dueDate: "2026-10-30T17:00:00Z",
-    slaHours: 48,
+    slaHours: 2,
     timeSpent: {
       todo: 7200,        // 2 hours in backlog refinement
       inProgress: 0,
@@ -59,7 +59,7 @@ export const INITIAL_TASKS = [
     priority: "Medium",
     createdAt: "2026-10-23T14:00:00Z",
     dueDate: "2026-10-29T12:00:00Z",
-    slaHours: 72,
+    slaHours: 7,
     timeSpent: {
       todo: 14400,       // 4 hours
       inProgress: 9000,  // 2h 30m
@@ -74,7 +74,7 @@ export const INITIAL_TASKS = [
     priority: "Medium",
     createdAt: "2026-10-25T09:00:00Z",
     dueDate: "2026-11-02T18:00:00Z",
-    slaHours: 72,
+    slaHours: 1,
     timeSpent: {
       todo: 3600,        // 1 hour
       inProgress: 0,
@@ -89,11 +89,11 @@ export const INITIAL_TASKS = [
     priority: "Low",
     createdAt: "2026-10-19T13:45:00Z",
     dueDate: "2026-10-24T18:00:00Z",
-    slaHours: 120,
+    slaHours: 7,
     timeSpent: {
       todo: 7200,        // 2 hours
       inProgress: 18000, // 5 hours
-      done: 3600         // 1 hour
+      done: 0            // 0 hours
     }
   },
   {

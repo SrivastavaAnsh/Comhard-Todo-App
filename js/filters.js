@@ -158,7 +158,7 @@ export function calculateSla(priority, dueDate = null) {
 }
 
 export function formatDuration(seconds) {
-  if (!seconds || seconds <= 0) return "0m";
+  if (!seconds || seconds <= 0) return "0h";
 
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
@@ -170,7 +170,10 @@ export function formatDuration(seconds) {
   if (hours > 0) {
     return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
   }
-  return `${Math.max(1, minutes)}m`;
+  if (minutes > 0) {
+    return `${minutes}m`;
+  }
+  return "0h";
 }
 
 export function formatDate(isoString) {

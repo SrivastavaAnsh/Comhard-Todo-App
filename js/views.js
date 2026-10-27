@@ -83,7 +83,7 @@ export function renderTimeSpentBar(timeSpent) {
 
   const pTodo = Math.round((todo / total) * 100);
   const pInProgress = Math.round((inProgress / total) * 100);
-  const pDone = Math.max(0, 100 - pTodo - pInProgress);
+  const pDone = done > 0 ? Math.max(0, 100 - pTodo - pInProgress) : 0;
 
   return `
     <div class="time-bar" title="Todo: ${formatDuration(todo)} (${pTodo}%) | In Progress: ${formatDuration(inProgress)} (${pInProgress}%) | Done: ${formatDuration(done)} (${pDone}%)">

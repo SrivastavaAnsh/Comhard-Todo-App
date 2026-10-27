@@ -1,14 +1,14 @@
 import { INITIAL_TASKS } from "./data.js";
 
 const STORAGE_KEY = "comhard_tasks_v1";
-const THEME_KEY = "comhard_theme_v1";
+const THEME_KEY = "comhard_theme_v2";
 const VIEW_KEY = "comhard_active_view_v1";
 
 class StateStore {
   constructor() {
     const hasStorage = typeof localStorage !== "undefined";
     this.tasks = this.loadTasks();
-    this.theme = (hasStorage && localStorage.getItem(THEME_KEY)) || "dark";
+    this.theme = (hasStorage && localStorage.getItem(THEME_KEY)) || "light";
     this.currentView = (hasStorage && localStorage.getItem(VIEW_KEY)) || "list";
     this.sidebarFilter = "all"; // 'all' | 'todo' | 'inprogress' | 'done'
     this.statusFilter = "all";  // 'all' | 'Todo' | 'In Progress' | 'Done'
@@ -32,8 +32,8 @@ class StateStore {
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            // Migrate any legacy 'Ongoing' status to 'In Progress'
-            return parsed.map(t => {
+            // Migrate any legacy 'Ongoing' status to 'In Progress' and ensure done is 0
+            const migrated = parsed.map(t => {
               const status = t.status === "Ongoing" ? "In Progress" : t.status;
               const inProgTime = (t.timeSpent?.inProgress !== undefined) 
                 ? t.timeSpent.inProgress 
@@ -48,10 +48,12 @@ class StateStore {
                 timeSpent: {
                   todo: t.timeSpent?.todo || 0,
                   inProgress: inProgTime,
-                  done: t.timeSpent?.done || 0
+                  done: (t.id === "TASK-102" || t.id === "TASK-106" || t.status === "Done") ? 0 : (t.timeSpent?.done || 0)
                 }
               };
             });
+            this.saveTasks(migrated);
+            return migrated;
           }
         }
       } catch (e) {
@@ -136,7 +138,7 @@ class StateStore {
       timeSpent: taskData.timeSpent || {
         todo: taskData.status === "Todo" ? 1800 : 0,
         inProgress: (taskData.status === "In Progress" || taskData.status === "Ongoing") ? 3600 : 0,
-        done: taskData.status === "Done" ? 1800 : 0
+        done: 0
       }
     };
 

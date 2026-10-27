@@ -32,39 +32,9 @@
   --dur-normal: 250ms;
 }
 
-/* ---------- DARK MODE (default) ---------- */
-[data-theme="dark"],
+/* ---------- LIGHT MODE (default) ---------- */
+[data-theme="light"],
 :root {
-  --bg-page:    #0a0a0a;
-  --bg-card:    #111111;
-  --bg-input:   #1a1a1a;
-  --bg-overlay: rgba(0,0,0,0.65);
-  --border:     rgba(255,255,255,0.08);
-  --border-hover: rgba(255,255,255,0.18);
-
-  --text-primary:   #f5f5f5;
-  --text-secondary: #9a9a9a;
-  --text-muted:     #5a5a5a;
-  --text-inverse:   #0a0a0a;
-
-  --accent:     #e5e5e5;
-  --accent-muted: #2a2a2a;
-  --accent-hover: #ffffff;
-
-  --status-todo:       #888888;
-  --status-inprogress: #d4d4d4;
-  --status-done:       #f5f5f5;
-  --status-todo-bg:    rgba(136,136,136,0.12);
-  --status-inprogress-bg: rgba(212,212,212,0.10);
-  --status-done-bg:    rgba(245,245,245,0.08);
-
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
-  --shadow-md: 0 4px 20px rgba(0,0,0,0.6);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.8);
-}
-
-/* ---------- LIGHT MODE ---------- */
-[data-theme="light"] {
   --bg-page:    #f5f5f5;
   --bg-card:    #ffffff;
   --bg-input:   #f0f0f0;
@@ -91,6 +61,36 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
   --shadow-md: 0 4px 20px rgba(0,0,0,0.15);
   --shadow-lg: 0 8px 40px rgba(0,0,0,0.2);
+}
+
+/* ---------- DARK MODE ---------- */
+[data-theme="dark"] {
+  --bg-page:    #0a0a0a;
+  --bg-card:    #111111;
+  --bg-input:   #1a1a1a;
+  --bg-overlay: rgba(0,0,0,0.65);
+  --border:     rgba(255,255,255,0.08);
+  --border-hover: rgba(255,255,255,0.18);
+
+  --text-primary:   #f5f5f5;
+  --text-secondary: #9a9a9a;
+  --text-muted:     #5a5a5a;
+  --text-inverse:   #0a0a0a;
+
+  --accent:     #e5e5e5;
+  --accent-muted: #2a2a2a;
+  --accent-hover: #ffffff;
+
+  --status-todo:       #888888;
+  --status-inprogress: #d4d4d4;
+  --status-done:       #f5f5f5;
+  --status-todo-bg:    rgba(136,136,136,0.12);
+  --status-inprogress-bg: rgba(212,212,212,0.10);
+  --status-done-bg:    rgba(245,245,245,0.08);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.6);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.8);
 }
 
 /* ---------- Reset ---------- */

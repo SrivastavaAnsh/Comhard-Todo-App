@@ -16,8 +16,8 @@ import * as sb from "./supabase.js";
 const isSupabaseConfigured = sb.isSupabaseConfigured ?? Boolean(sb.supabase);
 
 // ---- Theme ----
-const THEME_KEY = "comhard_theme_v1";
-let currentTheme = localStorage.getItem(THEME_KEY) || "dark";
+const THEME_KEY = "comhard_theme_v2";
+let currentTheme = localStorage.getItem(THEME_KEY) || "light";
 applyTheme(currentTheme);
 
 function applyTheme(theme) {

@@ -759,7 +759,7 @@ class App {
 
     const pTodo = totalSeconds > 0 ? Math.round((todoSeconds / totalSeconds) * 100) : 0;
     const pInProgress = totalSeconds > 0 ? Math.round((inProgressSeconds / totalSeconds) * 100) : 0;
-    const pDone = totalSeconds > 0 ? Math.max(0, 100 - pTodo - pInProgress) : 0;
+    const pDone = (doneSeconds > 0 && totalSeconds > 0) ? Math.max(0, 100 - pTodo - pInProgress) : 0;
 
     const isTodoActive = task.status === 'Todo';
     const isProgActive = task.status === 'In Progress' || task.status === 'Ongoing';

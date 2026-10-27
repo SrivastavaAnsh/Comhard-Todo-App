@@ -46,7 +46,7 @@ BEGIN
       48,
       '2026-10-25T17:00:00Z',
       '2026-10-18T10:00:00Z',
-      '{"todo": 18000, "inProgress": 32400, "done": 7200}'::jsonb
+      '{"todo": 18000, "inProgress": 32400, "done": 0}'::jsonb
     ),
     (
       'TASK-103',
@@ -94,7 +94,7 @@ BEGIN
       120,
       '2026-10-24T18:00:00Z',
       '2026-10-19T13:45:00Z',
-      '{"todo": 7200, "inProgress": 18000, "done": 3600}'::jsonb
+      '{"todo": 7200, "inProgress": 18000, "done": 0}'::jsonb
     ),
     (
       'TASK-107',

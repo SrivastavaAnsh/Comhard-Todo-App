@@ -74,7 +74,6 @@ Comhard Todo App/
 
 ---
 
-## ✅ Stage 2 Features
 
 ### Authentication
 - **Email + Password** — sign up, sign in with confirmation email support
@@ -93,7 +92,7 @@ Comhard Todo App/
 - **Supabase Realtime** subscriptions — changes reflect live across browser tabs
 - INSERT, UPDATE, DELETE events handled without page refresh
 
-### All Stage 1 Features (preserved)
+### All Stage 1 Features
 - **4 Views:** List, Grid, Kanban, Section
 - **Kanban drag-and-drop** with real status updates
 - **Horizontal scrolling** in Kanban view
@@ -101,7 +100,8 @@ Comhard Todo App/
 - **Add Task modal** with SLA auto-calculation
 - **Filters:** status, priority, search, sort, sort-order
 - **Section grouping** by status or priority
-- **Dark/Light mode** toggle (true black, no blue tints)
+- **Light/Dark mode** toggle (**Light mode by default**, with sleek high-contrast pure monochrome dark mode, zero blue tints)
+- **Accumulated Time Tracking** with visual progress bars across To-Do, In Progress, and Done (**Done section time is recorded as 0** once a task is resolved)
 - **Keyboard shortcuts:** `/` search, `N` new task, `1-4` views, `Esc` close
 - **Toast notifications** for all actions
 - **SLA chips** and due date indicators
