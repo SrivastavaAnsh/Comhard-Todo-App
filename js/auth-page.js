@@ -12,7 +12,8 @@ import {
   getSession,
   onAuthStateChange,
 } from "./auth.js";
-import { isSupabaseConfigured } from "./supabase.js";
+import * as sb from "./supabase.js";
+const isSupabaseConfigured = sb.isSupabaseConfigured ?? Boolean(sb.supabase);
 
 // ---- Theme ----
 const THEME_KEY = "comhard_theme_v1";
@@ -181,8 +182,8 @@ document.getElementById("form-signup")?.addEventListener("submit", async (e) => 
     showMsg("signup-msg", "Please enter your email address.", "error");
     return;
   }
-  if (password.length < 8) {
-    showMsg("signup-msg", "Password must be at least 8 characters.", "error");
+  if (password.length < 6) {
+    showMsg("signup-msg", "Password must be at least 6 characters.", "error");
     return;
   }
   if (password !== confirm) {
@@ -193,16 +194,37 @@ document.getElementById("form-signup")?.addEventListener("submit", async (e) => 
   setLoading("btn-signup", true);
   try {
     const data = await signUpWithEmail(email, password);
-    if (data?.user && !data.session) {
-      // Email confirmation required
-      showMsg(
-        "signup-msg",
-        "✅ Account created! Please check your email to confirm your account before signing in.",
-        "success"
-      );
-    } else if (data?.session) {
+    if (data?.session) {
       window.location.href = "/";
+      return;
     }
+
+    // Try signing in immediately (works if email confirmations are disabled or auto-confirmed)
+    try {
+      const signInRes = await signInWithEmail(email, password);
+      if (signInRes?.session) {
+        window.location.href = "/";
+        return;
+      }
+    } catch (_) {
+      // Email confirmation required by Supabase project settings
+    }
+
+    showMsg(
+      "signup-msg",
+      "Account created! Please check your email inbox to verify your account, or sign in below.",
+      "success"
+    );
+
+    // Pre-fill sign-in email and switch to Sign In after 2s
+    const signInEmailInput = document.getElementById("signin-email");
+    if (signInEmailInput) signInEmailInput.value = email;
+    setTimeout(() => {
+      setActiveTab("signin");
+      showPanel("signin");
+      showMsg("signin-msg", "Account created! Enter your password to sign in (or confirm via email if required).", "info");
+    }, 2000);
+
   } catch (err) {
     showMsg("signup-msg", err.message || "Sign up failed. Please try again.", "error");
   } finally {

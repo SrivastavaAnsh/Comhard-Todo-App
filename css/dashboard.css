@@ -173,6 +173,29 @@
   height: 15px;
 }
 
+.topbar-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.topbar-auth-btn:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-highlight);
+  color: #ffffff;
+}
+
 /* -------------------------------------------------------------
    2. FILTER & VIEW TOOLBAR
    ------------------------------------------------------------- */

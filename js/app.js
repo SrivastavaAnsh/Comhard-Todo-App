@@ -28,11 +28,11 @@ import {
 import { getIcon } from "./icons.js";
 
 // Supabase imports — gracefully degraded if env vars are missing
-import { isSupabaseConfigured } from "./supabase.js";
+import * as sb from "./supabase.js";
 import * as _authModule from "./auth.js";
 import * as _dbModule from "./db.js";
 
-const _supabaseEnabled = isSupabaseConfigured;
+const _supabaseEnabled = sb.isSupabaseConfigured ?? Boolean(sb.supabase);
 
 class App {
   constructor() {
@@ -223,6 +223,18 @@ class App {
         signOutBtn.title = "Sign in / Sign up";
       } else {
         signOutBtn.title = "Supabase not connected — Click for settings";
+      }
+    }
+
+    const topbarAuthBtn = document.getElementById("topbar-auth-btn");
+    const topbarAuthText = document.getElementById("topbar-auth-text");
+    if (topbarAuthBtn && topbarAuthText) {
+      if (user) {
+        topbarAuthText.textContent = user.email ? user.email.split("@")[0] : "Account";
+        topbarAuthBtn.title = "Signed in as " + (user.email || "user");
+      } else {
+        topbarAuthText.textContent = "Sign In";
+        topbarAuthBtn.title = "Sign In or Create Account";
       }
     }
   }
@@ -1086,7 +1098,19 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
-// Bootstrap app on DOM load
-document.addEventListener("DOMContentLoaded", () => {
-  window.comhardApp = new App();
-});
+// Bootstrap app reliably on load or immediate execution
+function bootApp() {
+  if (!window.comhardApp) {
+    try {
+      window.comhardApp = new App();
+    } catch (err) {
+      console.error("[TaskFlow] Error during App initialization:", err);
+    }
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bootApp);
+} else {
+  bootApp();
+}
