@@ -226,7 +226,15 @@ document.getElementById("form-signup")?.addEventListener("submit", async (e) => 
     }, 2000);
 
   } catch (err) {
-    showMsg("signup-msg", err.message || "Sign up failed. Please try again.", "error");
+    if (err.message && (err.message.includes("rate limit") || err.code === "over_email_send_rate_limit")) {
+      showMsg(
+        "signup-msg",
+        "⚠️ Supabase email rate limit reached. In Supabase Dashboard → Authentication → Providers → Email, turn OFF 'Confirm email' to allow unlimited instant signups.",
+        "error"
+      );
+    } else {
+      showMsg("signup-msg", err.message || "Sign up failed. Please try again.", "error");
+    }
   } finally {
     setLoading("btn-signup", false);
   }
