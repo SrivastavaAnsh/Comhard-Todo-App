@@ -1,0 +1,693 @@
+/* ==========================================================================
+   Comhard TaskFlow - All Views & Task Cards Styling
+   List, Grid, Kanban, Section, and Empty State Views
+   ========================================================================== */
+
+/* -------------------------------------------------------------
+   1. LIST VIEW STYLES
+   ------------------------------------------------------------- */
+.task-list-container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.task-list-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  background-color: var(--bg-surface-elevated);
+  border-bottom: 1px solid var(--border-default);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+}
+
+.header-col-status { width: 44px; }
+.header-col-id { width: 90px; }
+.header-col-main { flex: 1; min-width: 200px; padding-right: 16px; }
+.header-col-meta { display: flex; align-items: center; gap: 10px; width: 430px; }
+.header-col-actions { width: 80px; text-align: right; }
+
+.task-list-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.task-list-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.task-list-row:last-child {
+  border-bottom: none;
+}
+
+.task-list-row:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.task-list-row.is-done {
+  opacity: 0.75;
+}
+
+.list-col-status {
+  width: 44px;
+  display: flex;
+  align-items: center;
+}
+
+/* Status toggle button */
+.status-toggle-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-tertiary);
+  transition: all var(--transition-fast);
+}
+
+.status-toggle-btn:hover {
+  transform: scale(1.15);
+}
+
+.status-toggle-btn.status-todo:hover {
+  color: var(--primary);
+}
+
+.status-toggle-btn.status-ongoing {
+  color: var(--status-ongoing-dot);
+}
+
+.status-toggle-btn.status-done {
+  color: var(--status-done-dot);
+}
+
+.list-col-id {
+  width: 90px;
+  display: flex;
+  align-items: center;
+}
+
+.list-col-main {
+  flex: 1;
+  min-width: 200px;
+  padding-right: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.task-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+  transition: color var(--transition-fast);
+}
+
+.list-col-main:hover .task-title {
+  color: var(--primary);
+}
+
+.task-title-done {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.task-desc-snippet {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 460px;
+}
+
+.list-col-meta {
+  width: 430px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.list-col-actions {
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+@media (max-width: 1100px) {
+  .header-col-meta, .list-col-meta {
+    width: auto;
+    flex-wrap: wrap;
+  }
+}
+
+/* -------------------------------------------------------------
+   2. GRID VIEW STYLES
+   ------------------------------------------------------------- */
+.task-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.task-card-grid {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  position: relative;
+}
+
+.task-card-grid:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-highlight);
+  box-shadow: var(--shadow-md);
+}
+
+.task-card-grid.is-done {
+  opacity: 0.8;
+}
+
+.card-grid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-grid-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-grid-body {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-grid-body:hover .task-title {
+  color: var(--primary);
+}
+
+.task-desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Time card section */
+.card-grid-time {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.time-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.time-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+.time-label svg {
+  width: 12px;
+  height: 12px;
+}
+
+.time-total {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.time-breakdown-mini {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.mini-seg {
+  cursor: help;
+}
+
+.card-grid-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* -------------------------------------------------------------
+   3. KANBAN VIEW STYLES
+   ------------------------------------------------------------- */
+.kanban-board-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  min-height: calc(100vh - 190px);
+  animation: fadeIn 0.2s ease-out;
+  align-items: flex-start;
+}
+
+.kanban-column {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 190px);
+  box-shadow: var(--shadow-sm);
+}
+
+.kanban-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-default);
+  background-color: var(--bg-surface-elevated);
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+}
+
+.kanban-col-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kanban-status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.indicator-todo { background-color: #64748b; }
+.indicator-ongoing { background-color: #6366f1; box-shadow: 0 0 6px rgba(99, 102, 241, 0.6); }
+.indicator-done { background-color: #10b981; }
+
+.kanban-col-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.kanban-col-count {
+  font-size: 11px;
+  font-weight: 700;
+  background-color: var(--bg-surface);
+  color: var(--text-tertiary);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+}
+
+.kanban-cards-wrapper {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  min-height: 140px;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.kanban-cards-wrapper.drag-over {
+  background-color: var(--primary-subtle);
+  outline: 2px dashed var(--primary);
+  border-radius: var(--radius-md);
+}
+
+.kanban-card {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.kanban-card:active {
+  cursor: grabbing;
+}
+
+.kanban-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-highlight);
+  box-shadow: var(--shadow-md);
+}
+
+.kanban-card.is-dragging {
+  opacity: 0.4;
+  transform: scale(0.98);
+}
+
+.kanban-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kanban-card-body {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kanban-card-body:hover .task-title {
+  color: var(--primary);
+}
+
+.kanban-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.kanban-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kanban-column-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 16px;
+  gap: 10px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  text-align: center;
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 1000px) {
+  .kanban-board-container {
+    grid-template-columns: 1fr;
+    max-height: none;
+  }
+  .kanban-column {
+    max-height: none;
+  }
+}
+
+/* -------------------------------------------------------------
+   4. SECTION VIEW STYLES
+   ------------------------------------------------------------- */
+.section-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.section-view-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.group-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.section-group-toggle {
+  display: inline-flex;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  gap: 2px;
+}
+
+.pill-btn {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.pill-btn.active {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+.section-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.accordion-section {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background-color: var(--bg-surface-elevated);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.accordion-header:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.accordion-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.accordion-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  transition: transform var(--transition-fast);
+}
+
+.accordion-grp-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
+}
+
+.accordion-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.section-count-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background-color: var(--bg-surface);
+  color: var(--text-tertiary);
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+}
+
+.accordion-body {
+  transition: max-height var(--transition-normal) ease-out;
+}
+
+.accordion-body.collapsed {
+  display: none;
+}
+
+.accordion-body-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color var(--transition-fast);
+}
+
+.section-task-item:last-child {
+  border-bottom: none;
+}
+
+.section-task-item:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.section-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.section-item-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.section-item-title-wrap:hover .task-title {
+  color: var(--primary);
+}
+
+.section-item-desc {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 440px;
+}
+
+.section-item-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-empty-hint {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+/* -------------------------------------------------------------
+   5. EMPTY STATE STYLES
+   ------------------------------------------------------------- */
+.empty-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+  background-color: var(--bg-surface);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-xl);
+  max-width: 540px;
+  margin: 40px auto;
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.25s ease-out;
+}
+
+.empty-state-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  margin-bottom: 16px;
+}
+
+.empty-state-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.empty-state-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 420px;
+  margin-bottom: 24px;
+}
+
+.empty-state-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}

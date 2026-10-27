@@ -1,0 +1,388 @@
+/* ==========================================================================
+   Comhard TaskFlow - Main Dashboard Header & Filter Toolbar Styles
+   ========================================================================== */
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-app);
+}
+
+/* -------------------------------------------------------------
+   1. TOPBAR & PAGE HEADER
+   ------------------------------------------------------------- */
+.dashboard-topbar {
+  padding: 16px 24px;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.topbar-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-menu-btn {
+  display: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-surface-elevated);
+}
+
+.mobile-menu-btn:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.task-count-badge {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  background-color: var(--bg-surface-elevated);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Header Actions: Search, Add, Theme */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-bar-wrapper {
+  position: relative;
+  width: 320px;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon-left {
+  position: absolute;
+  left: 10px;
+  width: 15px;
+  height: 15px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding-left: 32px;
+  padding-right: 48px;
+  height: 38px;
+  font-size: 13px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+}
+
+.search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.search-input:focus {
+  background-color: var(--bg-surface);
+}
+
+.search-kbd-hint {
+  position: absolute;
+  right: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+  background-color: var(--bg-surface-hover);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  pointer-events: none;
+}
+
+.search-clear-btn {
+  display: none;
+  position: absolute;
+  right: 32px;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-tertiary);
+  background-color: var(--bg-surface-hover);
+  transition: all var(--transition-fast);
+}
+
+.search-clear-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--border-default);
+}
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+  border-color: var(--border-highlight);
+}
+
+.theme-toggle-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* -------------------------------------------------------------
+   2. FILTER & VIEW TOOLBAR
+   ------------------------------------------------------------- */
+.dashboard-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* View Selector (Segmented Pill Control) */
+.view-selector-group {
+  display: inline-flex;
+  background-color: var(--bg-surface-elevated);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  gap: 2px;
+}
+
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.view-btn svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-tertiary);
+}
+
+.view-btn:hover {
+  color: var(--text-primary);
+}
+
+.view-btn.active {
+  background-color: var(--bg-surface);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.view-btn.active svg {
+  color: var(--primary);
+}
+
+/* Filter Controls Group */
+.filter-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  height: 34px;
+  padding: 0 28px 0 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.filter-select:hover {
+  border-color: var(--border-highlight);
+  color: var(--text-primary);
+}
+
+.sort-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-sort-order {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+}
+
+.btn-sort-order:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.btn-sort-order svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Clear Filters Button */
+.btn-clear-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.6;
+  pointer-events: none;
+  transition: all var(--transition-fast);
+}
+
+.btn-clear-filters svg {
+  width: 13px;
+  height: 13px;
+}
+
+.btn-clear-filters.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  color: var(--primary);
+  background-color: var(--primary-subtle);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.btn-clear-filters.is-active:hover {
+  background-color: rgba(99, 102, 241, 0.2);
+}
+
+.active-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* -------------------------------------------------------------
+   3. VIEW CONTAINER
+   ------------------------------------------------------------- */
+.dashboard-view-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+  scroll-behavior: smooth;
+}
+
+/* Responsive queries */
+@media (max-width: 900px) {
+  .mobile-menu-btn {
+    display: flex;
+  }
+  .dashboard-topbar {
+    padding: 14px 16px;
+  }
+  .dashboard-view-container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar-header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .header-actions {
+    flex-wrap: wrap;
+  }
+  .search-bar-wrapper {
+    width: 100%;
+    order: 2;
+  }
+  .dashboard-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .view-selector-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .view-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  .filter-controls-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .filter-select {
+    flex: 1;
+    min-width: 120px;
+  }
+}
