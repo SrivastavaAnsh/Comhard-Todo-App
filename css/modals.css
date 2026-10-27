@@ -1,5 +1,7 @@
 /* ==========================================================================
-   Comhard TaskFlow - Modals, Dialogs, and Toast Notifications Styles
+   Comhard TaskFlow - Modals, Dialogs, SLA Forms, and Toast Notifications Styles
+   Monochrome Black & White - Zero Blue Color Accents
+   High Contrast Selected Status Indicator for Detail View
    ========================================================================== */
 
 /* -------------------------------------------------------------
@@ -9,7 +11,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 1000;
@@ -28,7 +30,7 @@
 .modal {
   display: none;
   width: 100%;
-  max-width: 560px;
+  max-width: 580px;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
@@ -60,7 +62,7 @@
 
 .modal-title {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
 }
 
@@ -69,7 +71,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .modal-footer {
@@ -83,7 +85,7 @@
 }
 
 /* -------------------------------------------------------------
-   2. FORM STYLES (Add Task Modal)
+   2. FORM STYLES & SLA AUTO-CALCULATION SECTION
    ------------------------------------------------------------- */
 .form-group {
   display: flex;
@@ -93,8 +95,8 @@
 
 .form-label {
   font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .form-label .required {
@@ -115,16 +117,120 @@
 
 .input-hint {
   font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* SLA Form Section in Add Task Modal */
+.sla-form-section {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sla-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sla-auto-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  letter-spacing: 0.02em;
+}
+
+.sla-calc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.sla-calc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sla-calc-target, .sla-calc-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sla-calc-label {
+  font-size: 10.5px;
+  font-weight: 600;
   color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sla-calc-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sla-number-input {
+  width: 72px;
+  height: 32px;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+}
+
+.sla-unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.sla-calc-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sla-calc-status {
+  font-size: 11px;
+  font-weight: 600;
+  color: #10b981;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.sla-calc-status.status-tight {
+  color: #f59e0b;
+}
+
+.sla-calc-status.status-breached {
+  color: #f43f5e;
 }
 
 /* -------------------------------------------------------------
    3. TASK DETAIL MODAL STYLES
+   - High Contrast Selected Status Display & Transition Buttons
    ------------------------------------------------------------- */
 .detail-header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -141,6 +247,66 @@
   line-height: 1.6;
 }
 
+/* Current Active Status Banner in Detail Modal */
+.detail-active-status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.status-banner-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Detail SLA Information Section */
+.detail-sla-card {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.detail-sla-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.detail-sla-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sla-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.sla-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sla-done-text {
+  color: #10b981;
+}
+
+.sla-active-text {
+  color: var(--text-primary);
+}
+
+/* Detail Time Spent Section */
 .detail-card-section {
   background-color: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
@@ -156,7 +322,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -165,7 +331,7 @@
 .section-subheading svg {
   width: 14px;
   height: 14px;
-  color: var(--primary);
+  color: var(--text-primary);
 }
 
 .detail-time-grid {
@@ -182,17 +348,23 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  transition: all var(--transition-fast);
+}
+
+.time-stat-box.active-stat-box {
+  border-color: var(--border-highlight);
+  box-shadow: 0 0 0 1px var(--border-highlight);
 }
 
 .time-stat-label {
   font-size: 10.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-tertiary);
 }
 
 .time-stat-val {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
 }
 
@@ -201,9 +373,13 @@
   color: var(--text-muted);
 }
 
-.time-box-todo .time-stat-val { color: #94a3b8; }
-.time-box-ongoing .time-stat-val { color: #818cf8; }
-.time-box-done .time-stat-val { color: #34d399; }
+.time-box-todo .time-stat-val { color: #d4d4d8; }
+.time-box-inprogress .time-stat-val { color: #f59e0b; }
+.time-box-done .time-stat-val { color: #10b981; }
+
+[data-theme="light"] .time-box-todo .time-stat-val { color: #27272a; }
+[data-theme="light"] .time-box-inprogress .time-stat-val { color: #b45309; }
+[data-theme="light"] .time-box-done .time-stat-val { color: #047857; }
 
 .detail-time-bar-wrapper {
   margin-top: 4px;
@@ -227,7 +403,7 @@
 
 .meta-label {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-tertiary);
@@ -245,61 +421,120 @@
   color: var(--text-secondary);
 }
 
-/* Quick Status Transition Buttons */
+/* =============================================================
+   QUICK STATUS TRANSITION BUTTONS (CRITICAL UI FIX)
+   The selected status is PROMINENTLY, UNMISTAKABLY HIGHLIGHTED!
+   ============================================================= */
 .detail-quick-status {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
+
+.quick-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quick-status-hint {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 500;
 }
 
 .status-btn-group {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 
+/* Default / Inactive Status Choice Button */
 .status-choice-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 12px;
+  gap: 7px;
+  padding: 10px 12px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-default);
+  border: 1.5px solid var(--border-default);
   background-color: var(--bg-surface-elevated);
-  color: var(--text-secondary);
-  font-size: 12px;
+  color: var(--text-primary);
+  font-size: 12.5px;
   font-weight: 600;
+  cursor: pointer;
   transition: all var(--transition-fast);
-}
-
-.status-choice-btn svg {
-  width: 14px;
-  height: 14px;
+  position: relative;
 }
 
 .status-choice-btn:hover {
   background-color: var(--bg-surface-hover);
-  color: var(--text-primary);
   border-color: var(--border-highlight);
+  transform: translateY(-1px);
 }
 
-.status-choice-btn.active.todo {
-  border-color: #94a3b8;
-  color: #f1f5f9;
-  background-color: rgba(148, 163, 184, 0.2);
+.choice-icon {
+  display: flex;
+  align-items: center;
 }
 
-.status-choice-btn.active.ongoing {
-  border-color: #6366f1;
-  color: #a5b4fc;
-  background-color: rgba(99, 102, 241, 0.25);
+.choice-icon svg {
+  width: 14px;
+  height: 14px;
 }
 
-.status-choice-btn.active.done {
-  border-color: #10b981;
-  color: #6ee7b7;
-  background-color: rgba(16, 185, 129, 0.25);
+/* SELECTED STATUS BUTTON: HIGH CONTRAST IN BOTH MODES */
+
+/* Light Mode Selected: Solid Pitch Black Button with White Text */
+[data-theme="light"] .status-choice-btn.is-selected {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .status-choice-btn.is-selected svg {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .status-selected-pill {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  margin-left: 4px;
+}
+
+/* Dark Mode Selected: Solid Pure White Button with Black Text */
+[data-theme="dark"] .status-choice-btn.is-selected {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .status-choice-btn.is-selected svg {
+  color: #000000 !important;
+}
+
+[data-theme="dark"] .status-selected-pill {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #000000;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  margin-left: 4px;
 }
 
 /* -------------------------------------------------------------
@@ -331,7 +566,7 @@
 
 .settings-desc p {
   font-size: 11.5px;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
@@ -380,12 +615,12 @@
   gap: 10px;
   padding: 12px 18px;
   background-color: var(--bg-surface-elevated);
-  border: 1px solid var(--border-default);
+  border: 1.5px solid var(--border-default);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   color: var(--text-primary);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   min-width: 260px;
   animation: slideInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   transition: opacity 0.3s, transform 0.3s;
@@ -403,21 +638,21 @@
 }
 
 .toast-success {
-  border-color: rgba(16, 185, 129, 0.4);
+  border-color: #10b981;
 }
 .toast-success .toast-icon {
   color: #10b981;
 }
 
 .toast-danger {
-  border-color: rgba(244, 63, 94, 0.4);
+  border-color: #f43f5e;
 }
 .toast-danger .toast-icon {
   color: #f43f5e;
 }
 
 .toast-info .toast-icon {
-  color: var(--primary);
+  color: var(--text-primary);
 }
 
 .toast.fade-out {
@@ -444,6 +679,9 @@
     grid-template-columns: 1fr;
   }
   .status-btn-group {
+    grid-template-columns: 1fr;
+  }
+  .detail-sla-row {
     grid-template-columns: 1fr;
   }
 }

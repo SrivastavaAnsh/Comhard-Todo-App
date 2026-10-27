@@ -1,6 +1,7 @@
 /* ==========================================================================
    Comhard TaskFlow - All Views & Task Cards Styling
-   List, Grid, Kanban, Section, and Empty State Views
+   List, Grid, Kanban (Horizontal & Vertical Scrolling), Section, and Empty State
+   Monochrome Black & White - Zero Blue Color Accents
    ========================================================================== */
 
 /* -------------------------------------------------------------
@@ -31,10 +32,10 @@
 }
 
 .header-col-status { width: 44px; }
-.header-col-id { width: 90px; }
-.header-col-main { flex: 1; min-width: 200px; padding-right: 16px; }
-.header-col-meta { display: flex; align-items: center; gap: 10px; width: 430px; }
-.header-col-actions { width: 80px; text-align: right; }
+.header-col-id { width: 85px; }
+.header-col-main { flex: 1; min-width: 180px; padding-right: 16px; }
+.header-col-meta { display: flex; align-items: center; gap: 8px; width: 480px; }
+.header-col-actions { width: 70px; text-align: right; }
 
 .task-list-body {
   display: flex;
@@ -82,14 +83,15 @@
 
 .status-toggle-btn:hover {
   transform: scale(1.15);
+  color: var(--text-primary);
 }
 
 .status-toggle-btn.status-todo:hover {
-  color: var(--primary);
+  color: var(--text-primary);
 }
 
-.status-toggle-btn.status-ongoing {
-  color: var(--status-ongoing-dot);
+.status-toggle-btn.status-inprogress {
+  color: var(--status-inprogress-dot);
 }
 
 .status-toggle-btn.status-done {
@@ -97,14 +99,14 @@
 }
 
 .list-col-id {
-  width: 90px;
+  width: 85px;
   display: flex;
   align-items: center;
 }
 
 .list-col-main {
   flex: 1;
-  min-width: 200px;
+  min-width: 180px;
   padding-right: 16px;
   cursor: pointer;
   display: flex;
@@ -114,14 +116,14 @@
 
 .task-title {
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   line-height: 1.4;
   transition: color var(--transition-fast);
 }
 
 .list-col-main:hover .task-title {
-  color: var(--primary);
+  color: var(--text-secondary);
 }
 
 .task-title-done {
@@ -131,23 +133,23 @@
 
 .task-desc-snippet {
   font-size: 12px;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 460px;
+  max-width: 420px;
 }
 
 .list-col-meta {
-  width: 430px;
+  width: 480px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .list-col-actions {
-  width: 80px;
+  width: 70px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -199,7 +201,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
+}
+
+.card-grid-header-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .card-grid-badges {
@@ -216,7 +224,7 @@
 }
 
 .card-grid-body:hover .task-title {
-  color: var(--primary);
+  color: var(--text-secondary);
 }
 
 .task-desc {
@@ -293,35 +301,46 @@
 
 /* -------------------------------------------------------------
    3. KANBAN VIEW STYLES
+   - HORIZONTAL SCROLLING across columns
+   - VERTICAL SCROLLING inside each column
    ------------------------------------------------------------- */
 .kanban-board-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 20px;
-  min-height: calc(100vh - 190px);
+  overflow-x: auto; /* True Horizontal Scrolling across columns */
+  overflow-y: hidden;
+  padding-bottom: 16px;
+  width: 100%;
+  height: calc(100vh - 195px);
+  min-height: 480px;
   animation: fadeIn 0.2s ease-out;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .kanban-column {
+  flex: 0 0 340px;
+  width: 340px;
+  min-width: 340px;
+  max-width: 340px;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 190px);
+  height: 100%;
+  max-height: 100%;
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
 .kanban-column-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-default);
   background-color: var(--bg-surface-elevated);
-  border-top-left-radius: var(--radius-lg);
-  border-top-right-radius: var(--radius-lg);
+  flex-shrink: 0;
 }
 
 .kanban-col-title-group {
@@ -336,12 +355,12 @@
   border-radius: 50%;
 }
 
-.indicator-todo { background-color: #64748b; }
-.indicator-ongoing { background-color: #6366f1; box-shadow: 0 0 6px rgba(99, 102, 241, 0.6); }
-.indicator-done { background-color: #10b981; }
+.indicator-todo { background-color: var(--status-todo-dot); }
+.indicator-inprogress { background-color: var(--status-inprogress-dot); box-shadow: 0 0 6px rgba(245, 158, 11, 0.5); }
+.indicator-done { background-color: var(--status-done-dot); }
 
 .kanban-col-title {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -350,25 +369,27 @@
   font-size: 11px;
   font-weight: 700;
   background-color: var(--bg-surface);
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   padding: 2px 8px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-subtle);
 }
 
+/* Kanban Cards Wrapper: True Vertical Scrolling */
 .kanban-cards-wrapper {
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow-y: auto;
-  min-height: 140px;
+  overflow-y: auto; /* True Vertical Scrolling inside each column */
+  flex: 1;
+  min-height: 100px;
   transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .kanban-cards-wrapper.drag-over {
-  background-color: var(--primary-subtle);
-  outline: 2px dashed var(--primary);
+  background-color: var(--bg-surface-hover);
+  outline: 2px dashed var(--border-highlight);
   border-radius: var(--radius-md);
 }
 
@@ -404,6 +425,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 6px;
+}
+
+.kanban-top-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .kanban-card-body {
@@ -414,7 +442,7 @@
 }
 
 .kanban-card-body:hover .task-title {
-  color: var(--primary);
+  color: var(--text-secondary);
 }
 
 .kanban-card-bottom {
@@ -443,16 +471,7 @@
   text-align: center;
   border: 1px dashed var(--border-default);
   border-radius: var(--radius-md);
-}
-
-@media (max-width: 1000px) {
-  .kanban-board-container {
-    grid-template-columns: 1fr;
-    max-height: none;
-  }
-  .kanban-column {
-    max-height: none;
-  }
+  margin: auto 0;
 }
 
 /* -------------------------------------------------------------
@@ -474,8 +493,8 @@
 
 .group-label {
   font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .section-group-toggle {
@@ -498,7 +517,8 @@
 
 .pill-btn.active {
   background-color: var(--primary);
-  color: #ffffff;
+  color: var(--primary-text);
+  font-weight: 700;
 }
 
 .section-list {
@@ -560,7 +580,7 @@
   font-size: 11px;
   font-weight: 700;
   background-color: var(--bg-surface);
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   padding: 2px 7px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-subtle);
@@ -601,7 +621,7 @@
   align-items: center;
   gap: 12px;
   flex: 1;
-  min-width: 200px;
+  min-width: 180px;
 }
 
 .section-item-title-wrap {
@@ -612,22 +632,22 @@
 }
 
 .section-item-title-wrap:hover .task-title {
-  color: var(--primary);
+  color: var(--text-secondary);
 }
 
 .section-item-desc {
   font-size: 11.5px;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 440px;
+  max-width: 420px;
 }
 
 .section-item-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .section-empty-hint {
@@ -665,13 +685,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
 .empty-state-title {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
   margin-bottom: 8px;
 }

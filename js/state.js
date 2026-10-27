@@ -19,6 +19,10 @@ class StateStore {
     this.sectionGroupBy = "status"; // 'status' | 'priority'
     this.collapsedSections = new Set();
     this.subscribers = [];
+
+    // Auth / Supabase state
+    this.currentUser = null;  // Supabase User object or null
+    this.isSyncing = false;   // true while loading from Supabase
   }
 
   loadTasks() {
@@ -85,6 +89,28 @@ class StateStore {
         console.error("Error in state subscriber:", err);
       }
     }
+  }
+
+  // --- Auth State ---
+
+  setUser(user) {
+    this.currentUser = user;
+    this.notify();
+  }
+
+  setSyncing(syncing) {
+    this.isSyncing = syncing;
+    this.notify();
+  }
+
+  /**
+   * Replace all tasks in state (called after loading from Supabase).
+   * Also persists to localStorage as a local cache.
+   */
+  setTasksFromRemote(tasks) {
+    this.tasks = tasks;
+    this.saveTasks(tasks);
+    this.notify();
   }
 
   // --- Task Operations ---

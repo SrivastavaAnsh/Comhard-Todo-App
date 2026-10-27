@@ -1,6 +1,7 @@
 /**
  * Comhard TaskFlow - Main Application Controller
- * Handles DOM wiring, event delegation, drag & drop, modals, and hotkeys.
+ * Handles DOM wiring, event delegation, drag & drop, modals, SLA calculation, and hotkeys.
+ * Stage 2: Supabase authentication + persistent task storage.
  */
 
 import { store } from "./state.js";
@@ -10,7 +11,8 @@ import {
   formatDuration,
   getTotalTime,
   hasActiveFilters,
-  getActiveFilterCount
+  getActiveFilterCount,
+  calculateSla
 } from "./filters.js";
 import {
   renderListView,
@@ -20,9 +22,17 @@ import {
   renderPriorityBadge,
   renderStatusBadge,
   renderDueDate,
-  renderTimeSpentBar
+  renderTimeSpentBar,
+  renderSlaChip
 } from "./views.js";
 import { getIcon } from "./icons.js";
+
+// Supabase imports — gracefully degraded if env vars are missing
+import { isSupabaseConfigured } from "./supabase.js";
+import * as _authModule from "./auth.js";
+import * as _dbModule from "./db.js";
+
+const _supabaseEnabled = isSupabaseConfigured;
 
 class App {
   constructor() {
@@ -31,12 +41,16 @@ class App {
     this.bindEvents();
     this.bindDragAndDrop();
     this.bindHotkeys();
+    this._realtimeUnsub = null;
 
     // Subscribe to store updates to auto-render
     this.unsubscribe = store.subscribe(() => this.render());
 
-    // Initial render
+    // Initial render with localStorage data
     this.render();
+
+    // Async: check Supabase session and sync
+    this.initSupabase();
   }
 
   initElements() {
@@ -50,7 +64,7 @@ class App {
     this.navItems = document.querySelectorAll(".nav-item[data-filter]");
     this.countAll = document.getElementById("count-all");
     this.countTodo = document.getElementById("count-todo");
-    this.countOngoing = document.getElementById("count-ongoing");
+    this.countInProgress = document.getElementById("count-inprogress");
     this.countDone = document.getElementById("count-done");
 
     // Main header elements
@@ -88,6 +102,131 @@ class App {
     this.updateThemeButtonIcon();
   }
 
+  // --- Supabase Auth + DB Integration ---
+
+  async initSupabase() {
+    if (!_supabaseEnabled) {
+      this.updateUserUI(null);
+      return;
+    }
+
+    // Listen for auth state changes
+    _authModule.onAuthStateChange(async (event, session) => {
+      const user = session ? session.user : null;
+      store.setUser(user);
+      this.updateUserUI(user);
+
+      if (event === "SIGNED_IN" && user) {
+        await this.syncTasksFromSupabase(user);
+        this.subscribeToRealtime();
+      } else if (event === "SIGNED_OUT") {
+        this.unsubscribeRealtime();
+        // Don't clear tasks — keep localStorage version for offline use
+      }
+    });
+
+    // Check existing session
+    try {
+      const session = await _authModule.getSession();
+      const user = session ? session.user : null;
+      store.setUser(user);
+      this.updateUserUI(user);
+
+      if (user) {
+        await this.syncTasksFromSupabase(user);
+        this.subscribeToRealtime();
+      }
+    } catch (err) {
+      console.warn("Could not get Supabase session:", err.message);
+      this.updateUserUI(null);
+    }
+  }
+
+  async syncTasksFromSupabase(user) {
+    if (!_dbModule || !user) return;
+    store.setSyncing(true);
+    try {
+      const remoteTasks = await _dbModule.fetchTasks();
+      if (remoteTasks.length > 0) {
+        store.setTasksFromRemote(remoteTasks);
+      } else {
+        // First login: seed Supabase with existing localStorage tasks
+        await _dbModule.upsertTasks(store.tasks, user.id);
+      }
+    } catch (err) {
+      console.error("Failed to sync tasks from Supabase:", err.message);
+      this.showToast("Could not sync tasks — using local data", "info");
+    } finally {
+      store.setSyncing(false);
+    }
+  }
+
+  subscribeToRealtime() {
+    if (!_dbModule) return;
+    this.unsubscribeRealtime();
+    this._realtimeUnsub = _dbModule.subscribeToTasks(
+      (newTask) => {
+        // INSERT: add if not already present
+        if (!store.tasks.find(t => t.id === newTask.id)) {
+          store.tasks = [newTask, ...store.tasks];
+          store.saveTasks(store.tasks);
+          store.notify();
+        }
+      },
+      (updatedTask) => {
+        // UPDATE: patch in place
+        store.tasks = store.tasks.map(t => t.id === updatedTask.id ? { ...t, ...updatedTask } : t);
+        store.saveTasks(store.tasks);
+        store.notify();
+      },
+      (deletedId) => {
+        // DELETE
+        store.tasks = store.tasks.filter(t => t.id !== deletedId);
+        store.saveTasks(store.tasks);
+        store.notify();
+      }
+    );
+  }
+
+  unsubscribeRealtime() {
+    if (this._realtimeUnsub) {
+      this._realtimeUnsub();
+      this._realtimeUnsub = null;
+    }
+  }
+
+  updateUserUI(user) {
+    const avatarEl = document.getElementById("user-avatar-initials");
+    const nameEl = document.getElementById("user-display-name");
+    const emailEl = document.getElementById("user-display-email");
+    const subtitleEl = document.getElementById("sidebar-subtitle");
+
+    if (user) {
+      const email = user.email || "";
+      const initials = email.substring(0, 2).toUpperCase();
+      if (avatarEl) avatarEl.textContent = initials;
+      if (nameEl) nameEl.textContent = email.split("@")[0] || "User";
+      if (emailEl) emailEl.textContent = email;
+      if (subtitleEl) subtitleEl.textContent = "Synced Workspace";
+    } else {
+      if (avatarEl) avatarEl.textContent = "?";
+      if (nameEl) nameEl.textContent = _supabaseEnabled ? "Not signed in" : "Local Workspace";
+      if (emailEl) emailEl.textContent = _supabaseEnabled ? "Sign in to sync tasks" : "localStorage mode";
+      if (subtitleEl) subtitleEl.textContent = _supabaseEnabled ? "Sign in to sync" : "Offline Mode";
+    }
+
+    const signOutBtn = document.getElementById("btn-sign-out");
+    if (signOutBtn) {
+      if (user) {
+        signOutBtn.title = "Sign out";
+      } else if (_supabaseEnabled) {
+        signOutBtn.title = "Sign in / Sign up";
+      } else {
+        signOutBtn.title = "Supabase not connected — Click for settings";
+      }
+    }
+  }
+
   updateThemeButtonIcon() {
     if (this.themeToggleBtn) {
       this.themeToggleBtn.innerHTML = store.theme === "dark" 
@@ -102,7 +241,7 @@ class App {
     const counts = store.getCounts();
     if (this.countAll) this.countAll.textContent = counts.all;
     if (this.countTodo) this.countTodo.textContent = counts.todo;
-    if (this.countOngoing) this.countOngoing.textContent = counts.ongoing;
+    if (this.countInProgress) this.countInProgress.textContent = counts.inProgress;
     if (this.countDone) this.countDone.textContent = counts.done;
 
     // 2. Update active nav in sidebar
@@ -149,7 +288,8 @@ class App {
     const titleMap = {
       all: "All Tasks",
       todo: "To-Do Tasks",
-      ongoing: "Ongoing Tasks",
+      inprogress: "In Progress Tasks",
+      ongoing: "In Progress Tasks",
       done: "Completed Tasks"
     };
     if (this.pageTitle) {
@@ -253,6 +393,18 @@ class App {
       this.openAddTaskModal();
     });
 
+    // Auto-update SLA in Add Task Modal
+    document.getElementById("add-task-priority")?.addEventListener("change", () => {
+      this.updateModalSlaPreview();
+    });
+    document.getElementById("add-task-due")?.addEventListener("input", () => {
+      this.updateModalSlaPreview();
+    });
+    document.getElementById("add-task-sla")?.addEventListener("input", () => {
+      const slaInput = document.getElementById("add-task-sla");
+      if (slaInput) slaInput.dataset.manual = "true";
+    });
+
     // Add Task Form Submit
     this.addTaskForm?.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -263,6 +415,26 @@ class App {
     document.getElementById("btn-open-settings")?.addEventListener("click", () => {
       this.openSettingsModal();
       this.toggleMobileSidebar(false);
+    });
+
+    // Sign Out
+    document.getElementById("btn-sign-out")?.addEventListener("click", async () => {
+      if (!_supabaseEnabled) {
+        this.showToast("Replace the placeholder values in .env with your real Supabase keys to connect", "warning");
+        this.openSettingsModal();
+        return;
+      }
+      if (!store.currentUser) {
+        window.location.href = "/auth.html";
+        return;
+      }
+      try {
+        await _authModule.signOut();
+        this.showToast("Signed out successfully");
+        setTimeout(() => { window.location.href = "/auth.html"; }, 800);
+      } catch (err) {
+        this.showToast("Sign out failed: " + err.message, "danger");
+      }
     });
 
     // Global Action Delegation on container
@@ -314,7 +486,6 @@ class App {
   // --- Keyboard Shortcuts ---
   bindHotkeys() {
     window.addEventListener("keydown", (e) => {
-      // Ignore if user is typing in an input or textarea
       const isInputActive = ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName);
 
       if (e.key === "Escape") {
@@ -382,7 +553,7 @@ class App {
         }
       });
 
-      col.addEventListener("drop", (e) => {
+      col.addEventListener("drop", async (e) => {
         e.preventDefault();
         col.classList.remove("drag-over");
         const taskId = e.dataTransfer.getData("text/plain") || this.draggedTaskId;
@@ -392,6 +563,14 @@ class App {
           const task = store.tasks.find(t => t.id === taskId);
           if (task && task.status !== targetStatus) {
             store.updateTaskStatus(taskId, targetStatus);
+            // Persist to Supabase
+            if (_dbModule && store.currentUser) {
+              try {
+                await _dbModule.updateTask(taskId, { status: targetStatus });
+              } catch (err) {
+                console.error("Failed to sync kanban status to Supabase:", err.message);
+              }
+            }
             this.showToast(`Moved ${taskId} to ${targetStatus}`);
           }
         }
@@ -400,23 +579,43 @@ class App {
   }
 
   // --- Status & Task Actions ---
-  cycleTaskStatus(taskId) {
+  async cycleTaskStatus(taskId) {
     const task = store.tasks.find(t => t.id === taskId);
     if (!task) return;
 
     let nextStatus = "Todo";
-    if (task.status === "Todo") nextStatus = "Ongoing";
-    else if (task.status === "Ongoing") nextStatus = "Done";
+    if (task.status === "Todo") nextStatus = "In Progress";
+    else if (task.status === "In Progress" || task.status === "Ongoing") nextStatus = "Done";
     else if (task.status === "Done") nextStatus = "Todo";
 
     store.updateTaskStatus(taskId, nextStatus);
+
+    // Persist to Supabase
+    if (_dbModule && store.currentUser) {
+      try {
+        await _dbModule.updateTask(taskId, { status: nextStatus });
+      } catch (err) {
+        console.error("Failed to update task status in Supabase:", err.message);
+      }
+    }
+
     this.showToast(`Updated ${task.id} status to ${nextStatus}`);
   }
 
-  confirmDeleteTask(taskId) {
+  async confirmDeleteTask(taskId) {
     if (confirm(`Are you sure you want to delete task ${taskId}?`)) {
       store.deleteTask(taskId);
       this.closeAllModals();
+
+      // Persist to Supabase
+      if (_dbModule && store.currentUser) {
+        try {
+          await _dbModule.deleteTask(taskId);
+        } catch (err) {
+          console.error("Failed to delete task from Supabase:", err.message);
+        }
+      }
+
       this.showToast(`Task ${taskId} removed`, "danger");
     }
   }
@@ -439,6 +638,9 @@ class App {
     // Reset form
     this.addTaskForm?.reset();
 
+    const slaInput = document.getElementById("add-task-sla");
+    if (slaInput) slaInput.dataset.manual = "false";
+
     // Default due date: 3 days from today in YYYY-MM-DD
     const dueDefault = new Date(Date.now() + 86400000 * 3).toISOString().split("T")[0];
     const dueDateInput = document.getElementById("add-task-due");
@@ -447,30 +649,56 @@ class App {
     // Prefill status or priority if provided from column / section
     if (prefill.status) {
       const statusSelect = document.getElementById("add-task-status");
-      if (statusSelect) statusSelect.value = prefill.status;
+      const normalizedPrefill = (prefill.status === "Ongoing") ? "In Progress" : prefill.status;
+      if (statusSelect) statusSelect.value = normalizedPrefill;
     }
     if (prefill.groupField === "status" && prefill.groupValue) {
       const statusSelect = document.getElementById("add-task-status");
-      if (statusSelect) statusSelect.value = prefill.groupValue;
+      const normalizedGroup = (prefill.groupValue === "Ongoing") ? "In Progress" : prefill.groupValue;
+      if (statusSelect) statusSelect.value = normalizedGroup;
     }
     if (prefill.groupField === "priority" && prefill.groupValue) {
       const prioritySelect = document.getElementById("add-task-priority");
       if (prioritySelect) prioritySelect.value = prefill.groupValue;
     }
 
+    // Auto-calculate SLA initial preview
+    this.updateModalSlaPreview();
+
     this.modalOverlay?.classList.add("active");
     this.addTaskModal.classList.add("active");
     document.getElementById("add-task-title")?.focus();
   }
 
-  handleAddTaskSubmit() {
+  updateModalSlaPreview() {
+    const priority = document.getElementById("add-task-priority")?.value || "Medium";
+    const dueDate = document.getElementById("add-task-due")?.value || null;
+    const sla = calculateSla(priority, dueDate);
+
+    const slaInput = document.getElementById("add-task-sla");
+    if (slaInput && (!slaInput.dataset.manual || slaInput.dataset.manual === "false")) {
+      slaInput.value = sla.targetHours;
+    }
+
+    const deadlineText = document.getElementById("sla-deadline-text");
+    if (deadlineText) deadlineText.textContent = sla.formattedDeadline;
+
+    const statusText = document.getElementById("sla-status-text");
+    if (statusText) {
+      statusText.textContent = `✓ ${sla.statusText} (${sla.formattedTarget})`;
+      statusText.className = `sla-calc-status status-${sla.status}`;
+    }
+  }
+
+  async handleAddTaskSubmit() {
     const title = document.getElementById("add-task-title")?.value;
     const description = document.getElementById("add-task-desc")?.value;
     const priority = document.getElementById("add-task-priority")?.value;
     const status = document.getElementById("add-task-status")?.value;
     const dueDate = document.getElementById("add-task-due")?.value;
+    const slaHours = parseInt(document.getElementById("add-task-sla")?.value || "72", 10);
     const todoHours = parseFloat(document.getElementById("add-time-todo")?.value || "0");
-    const ongoingHours = parseFloat(document.getElementById("add-time-ongoing")?.value || "0");
+    const inProgressHours = parseFloat(document.getElementById("add-time-inprogress")?.value || "0");
     const doneHours = parseFloat(document.getElementById("add-time-done")?.value || "0");
 
     if (!title || !title.trim()) {
@@ -482,14 +710,25 @@ class App {
       title,
       description,
       priority,
-      status,
+      status: status === "Ongoing" ? "In Progress" : status,
       dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+      slaHours: isNaN(slaHours) ? 72 : slaHours,
       timeSpent: {
         todo: Math.round(todoHours * 3600),
-        ongoing: Math.round(ongoingHours * 3600),
+        inProgress: Math.round(inProgressHours * 3600),
         done: Math.round(doneHours * 3600)
       }
     });
+
+    // Persist to Supabase if connected
+    if (_dbModule && store.currentUser) {
+      try {
+        await _dbModule.createTask(newTask, store.currentUser.id);
+      } catch (err) {
+        console.error("Failed to save task to Supabase:", err.message);
+        this.showToast("Task saved locally only — sync failed", "info");
+      }
+    }
 
     this.closeAllModals();
     this.showToast(`Task ${newTask.id} created successfully!`, "success");
@@ -501,12 +740,18 @@ class App {
 
     const totalSeconds = getTotalTime(task.timeSpent);
     const todoSeconds = task.timeSpent?.todo || 0;
-    const ongoingSeconds = task.timeSpent?.ongoing || 0;
+    const inProgressSeconds = (task.timeSpent?.inProgress !== undefined) 
+      ? task.timeSpent.inProgress 
+      : (task.timeSpent?.ongoing || 0);
     const doneSeconds = task.timeSpent?.done || 0;
 
     const pTodo = totalSeconds > 0 ? Math.round((todoSeconds / totalSeconds) * 100) : 0;
-    const pOngoing = totalSeconds > 0 ? Math.round((ongoingSeconds / totalSeconds) * 100) : 0;
-    const pDone = totalSeconds > 0 ? Math.max(0, 100 - pTodo - pOngoing) : 0;
+    const pInProgress = totalSeconds > 0 ? Math.round((inProgressSeconds / totalSeconds) * 100) : 0;
+    const pDone = totalSeconds > 0 ? Math.max(0, 100 - pTodo - pInProgress) : 0;
+
+    const isTodoActive = task.status === 'Todo';
+    const isProgActive = task.status === 'In Progress' || task.status === 'Ongoing';
+    const isDoneActive = task.status === 'Done';
 
     this.detailModal.innerHTML = `
       <div class="modal-dialog">
@@ -515,6 +760,7 @@ class App {
             <span class="task-id-pill">${task.id}</span>
             ${renderPriorityBadge(task.priority)}
             ${renderStatusBadge(task.status)}
+            ${task.slaHours ? renderSlaChip(task.slaHours) : ''}
           </div>
           <button class="btn-icon" data-close-modal title="Close">
             ${getIcon('x')}
@@ -525,20 +771,48 @@ class App {
           <h2 class="detail-task-title">${escapeHtml(task.title)}</h2>
           <p class="detail-task-desc">${escapeHtml(task.description || "No description provided.")}</p>
 
+          <!-- Current Active Status Highlight Banner -->
+          <div class="detail-active-status-banner">
+            <span class="status-banner-label">Current Active Status:</span>
+            <div class="status-banner-badge-wrap">
+              ${renderStatusBadge(task.status)}
+            </div>
+          </div>
+
+          <!-- SLA Details Section -->
+          <div class="detail-sla-card">
+            <div class="detail-sla-row">
+              <div class="detail-sla-item">
+                <span class="sla-label">SLA Target Duration</span>
+                <span class="sla-val font-semibold">${task.slaHours || 72} hours</span>
+              </div>
+              <div class="detail-sla-item">
+                <span class="sla-label">Due Date Target</span>
+                <span class="sla-val">${formatDate(task.dueDate)}</span>
+              </div>
+              <div class="detail-sla-item">
+                <span class="sla-label">Resolution Status</span>
+                <span class="sla-val ${task.status === 'Done' ? 'sla-done-text' : 'sla-active-text'}">
+                  ${task.status === 'Done' ? '✓ Completed' : 'In Service'}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div class="detail-card-section">
             <h4 class="section-subheading">${getIcon("clock")} Accumulated Time Spent in Each Status</h4>
             <div class="detail-time-grid">
-              <div class="time-stat-box time-box-todo">
+              <div class="time-stat-box time-box-todo ${isTodoActive ? 'active-stat-box' : ''}">
                 <span class="time-stat-label">To-Do Status</span>
                 <span class="time-stat-val">${formatDuration(todoSeconds)}</span>
                 <span class="time-stat-pct">${pTodo}% of total</span>
               </div>
-              <div class="time-stat-box time-box-ongoing">
-                <span class="time-stat-label">Ongoing Status</span>
-                <span class="time-stat-val">${formatDuration(ongoingSeconds)}</span>
-                <span class="time-stat-pct">${pOngoing}% of total</span>
+              <div class="time-stat-box time-box-inprogress ${isProgActive ? 'active-stat-box' : ''}">
+                <span class="time-stat-label">In Progress Status</span>
+                <span class="time-stat-val">${formatDuration(inProgressSeconds)}</span>
+                <span class="time-stat-pct">${pInProgress}% of total</span>
               </div>
-              <div class="time-stat-box time-box-done">
+              <div class="time-stat-box time-box-done ${isDoneActive ? 'active-stat-box' : ''}">
                 <span class="time-stat-label">Done Status</span>
                 <span class="time-stat-val">${formatDuration(doneSeconds)}</span>
                 <span class="time-stat-pct">${pDone}% of total</span>
@@ -571,16 +845,25 @@ class App {
           </div>
 
           <div class="detail-quick-status">
-            <label class="meta-label">Quick Status Transition</label>
+            <div class="quick-status-header">
+              <label class="meta-label">Quick Status Transition</label>
+              <span class="quick-status-hint">Click below to transition status</span>
+            </div>
             <div class="status-btn-group">
-              <button class="status-choice-btn ${task.status === 'Todo' ? 'active todo' : ''}" data-detail-status="Todo">
-                ${getIcon('circle')} Set To-Do
+              <button class="status-choice-btn ${isTodoActive ? 'is-selected active-todo' : ''}" data-detail-status="Todo">
+                <span class="choice-icon">${getIcon('circle')}</span>
+                <span class="choice-text">To-Do</span>
+                ${isTodoActive ? '<span class="status-selected-pill">✓ Current</span>' : ''}
               </button>
-              <button class="status-choice-btn ${task.status === 'Ongoing' ? 'active ongoing' : ''}" data-detail-status="Ongoing">
-                ${getIcon('clock')} Set Ongoing
+              <button class="status-choice-btn ${isProgActive ? 'is-selected active-inprogress' : ''}" data-detail-status="In Progress">
+                <span class="choice-icon">${getIcon('clock')}</span>
+                <span class="choice-text">In Progress</span>
+                ${isProgActive ? '<span class="status-selected-pill">✓ Current</span>' : ''}
               </button>
-              <button class="status-choice-btn ${task.status === 'Done' ? 'active done' : ''}" data-detail-status="Done">
-                ${getIcon('checkCircle')} Set Done
+              <button class="status-choice-btn ${isDoneActive ? 'is-selected active-done' : ''}" data-detail-status="Done">
+                <span class="choice-icon">${getIcon('checkCircle')}</span>
+                <span class="choice-text">Done</span>
+                ${isDoneActive ? '<span class="status-selected-pill">✓ Current</span>' : ''}
               </button>
             </div>
           </div>
@@ -603,10 +886,18 @@ class App {
     });
 
     this.detailModal.querySelectorAll("[data-detail-status]").forEach(b => {
-      b.addEventListener("click", (e) => {
+      b.addEventListener("click", async (e) => {
         const nextStatus = b.getAttribute("data-detail-status");
         if (nextStatus) {
           store.updateTaskStatus(task.id, nextStatus);
+          // Persist to Supabase
+          if (_dbModule && store.currentUser) {
+            try {
+              await _dbModule.updateTask(task.id, { status: nextStatus });
+            } catch (err) {
+              console.error("Failed to update task status in Supabase:", err.message);
+            }
+          }
           this.showToast(`Updated status to ${nextStatus}`);
           this.openTaskDetailModal(task.id); // re-render detail
         }
@@ -642,7 +933,7 @@ class App {
             <div class="settings-row">
               <div class="settings-desc">
                 <strong>Color Theme</strong>
-                <p>Toggle between high-contrast Dark and modern Clean Light mode.</p>
+                <p>Toggle between True Black Dark mode and Crisp Monochrome Light mode (zero blue tints).</p>
               </div>
               <button class="btn-secondary" id="settings-theme-btn">
                 ${store.theme === 'dark' ? getIcon('sun') + ' Light' : getIcon('moon') + ' Dark'}
@@ -655,7 +946,7 @@ class App {
             <div class="settings-row">
               <div class="settings-desc">
                 <strong>Reset to Default Tasks</strong>
-                <p>Restores the original 9 realistic engineering tasks with initial accumulated times.</p>
+                <p>Restores the original realistic tasks with In Progress status and SLA hours.</p>
               </div>
               <button class="btn-secondary" id="settings-reset-tasks-btn">
                 ${getIcon('refresh')} Reset Tasks
@@ -664,19 +955,49 @@ class App {
           </div>
 
           <div class="settings-section">
-            <h4 class="section-subheading">Stage 2 Roadmap & Architecture Preview</h4>
+            <h4 class="section-subheading">Stage 2 — Supabase Status</h4>
+            ${_supabaseEnabled ? `
+              <div class="settings-row">
+                <div class="settings-desc">
+                  <strong>${store.currentUser ? '✅ Connected & Syncing' : '⚠️ Not Signed In'}</strong>
+                  <p>${store.currentUser 
+                    ? `Signed in as <strong>${escapeHtml(store.currentUser.email || '')}</strong>. Tasks persist in Supabase PostgreSQL with RLS.`
+                    : 'Sign in to enable cloud sync, multi-device support, and persistent task storage.'
+                  }</p>
+                </div>
+                ${store.currentUser 
+                  ? `<button class="btn-secondary" id="settings-signout-btn">${getIcon('x')} Sign Out</button>`
+                  : `<a href="/auth.html" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">${getIcon('checkCircle')} Sign In</a>`
+                }
+              </div>
+            ` : `
+              <div class="settings-row">
+                <div class="settings-desc">
+                  <strong>🔌 Offline Mode (localStorage)</strong>
+                  <p>Configure <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in <code>.env</code> to enable cloud sync.</p>
+                </div>
+              </div>
+            `}
+          </div>
+
+          <div class="settings-section">
+            <h4 class="section-subheading">Architecture</h4>
             <ul class="roadmap-list">
               <li>
-                <span class="badge badge-status-ongoing">Next</span>
-                <strong>Supabase Authentication:</strong> Signup, magic link, email verification, session tokens.
+                <span class="badge badge-status-done">✓ Done</span>
+                <strong>Supabase Auth:</strong> Email/password, magic link, password reset, session tokens.
               </li>
               <li>
-                <span class="badge badge-status-todo">Upcoming</span>
-                <strong>PostgreSQL Persistence:</strong> Row Level Security (RLS) isolating tasks per user account.
+                <span class="badge badge-status-done">✓ Done</span>
+                <strong>PostgreSQL Persistence:</strong> Row Level Security (RLS) — each user sees only their tasks.
               </li>
               <li>
-                <span class="badge badge-status-todo">Upcoming</span>
-                <strong>Live SLA & Duration Tracking:</strong> Real-time elapsed duration stopwatch and status history logs.
+                <span class="badge badge-status-done">✓ Done</span>
+                <strong>Real-time Subscriptions:</strong> Live task updates across tabs via Supabase Realtime.
+              </li>
+              <li>
+                <span class="badge badge-status-inprogress">Next</span>
+                <strong>Live SLA Tracking:</strong> Real-time elapsed duration stopwatch and status history logs.
               </li>
             </ul>
           </div>
@@ -699,10 +1020,23 @@ class App {
     });
 
     this.settingsModal.querySelector("#settings-reset-tasks-btn")?.addEventListener("click", () => {
-      if (confirm("Reset all tasks back to the default initial sample dataset?")) {
+      if (confirm("Reset all tasks back to the default sample dataset?")) {
         store.resetToDefaultTasks();
         this.closeAllModals();
         this.showToast("Tasks reset to default sample dataset", "success");
+      }
+    });
+
+    this.settingsModal.querySelector("#settings-signout-btn")?.addEventListener("click", async () => {
+      if (_authModule) {
+        try {
+          await _authModule.signOut();
+          this.closeAllModals();
+          this.showToast("Signed out successfully");
+          setTimeout(() => { window.location.href = "/auth.html"; }, 800);
+        } catch (err) {
+          this.showToast("Sign out failed: " + err.message, "danger");
+        }
       }
     });
 

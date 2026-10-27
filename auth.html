@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Comhard TaskFlow</title>
+  <meta name="description" content="Sign in to Comhard TaskFlow — your personal task management workspace." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✓</text></svg>" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+
+<!-- Theme Toggle Button -->
+<button id="auth-theme-toggle" class="auth-theme-btn" title="Toggle theme" aria-label="Toggle color theme">
+  ☀️
+</button>
+
+<!-- Auth Page -->
+<main class="auth-page">
+  <div class="auth-card" role="main">
+
+    <!-- Brand Header -->
+    <div class="auth-brand">
+      <div class="auth-brand-logo" aria-hidden="true">CT</div>
+      <span class="auth-brand-name">Comhard TaskFlow</span>
+      <span class="auth-brand-tagline">Your personal task management workspace</span>
+    </div>
+
+    <!-- Tab Switcher -->
+    <div class="auth-tabs" role="tablist" aria-label="Authentication mode">
+      <button class="auth-tab-btn active" id="tab-signin" role="tab" aria-selected="true" aria-controls="panel-signin">Sign In</button>
+      <button class="auth-tab-btn" id="tab-signup" role="tab" aria-selected="false" aria-controls="panel-signup">Create Account</button>
+    </div>
+
+    <!-- ── SIGN IN PANEL ── -->
+    <div class="auth-panel active" id="panel-signin" role="tabpanel" aria-labelledby="tab-signin">
+
+      <!-- Error/Success messages -->
+      <div class="auth-message" id="signin-msg" role="alert" aria-live="polite"></div>
+
+      <form id="form-signin" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="signin-email">Email Address</label>
+          <input
+            id="signin-email"
+            type="email"
+            class="form-input"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signin-password">Password</label>
+          <input
+            id="signin-password"
+            type="password"
+            class="form-input"
+            placeholder="Your password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn-auth-primary" id="btn-signin">
+          <div class="auth-spinner" aria-hidden="true"></div>
+          <span class="btn-label">Sign In</span>
+        </button>
+      </form>
+
+      <div class="auth-divider">or</div>
+
+      <button class="btn-auth-secondary" id="btn-magic-link">
+        ✉️ Send Magic Link (passwordless)
+      </button>
+
+      <div class="auth-footer-links">
+        <button class="auth-text-link" id="btn-forgot-password">Forgot password?</button>
+      </div>
+    </div>
+
+    <!-- ── SIGN UP PANEL ── -->
+    <div class="auth-panel" id="panel-signup" role="tabpanel" aria-labelledby="tab-signup">
+
+      <div class="auth-message" id="signup-msg" role="alert" aria-live="polite"></div>
+
+      <form id="form-signup" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="signup-email">Email Address</label>
+          <input
+            id="signup-email"
+            type="email"
+            class="form-input"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signup-password">Password</label>
+          <input
+            id="signup-password"
+            type="password"
+            class="form-input"
+            placeholder="Min 8 characters"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          />
+          <div class="password-strength" aria-hidden="true">
+            <div class="password-strength-bar" id="password-strength-bar"></div>
+          </div>
+          <span class="form-hint" id="password-strength-label"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signup-password-confirm">Confirm Password</label>
+          <input
+            id="signup-password-confirm"
+            type="password"
+            class="form-input"
+            placeholder="Repeat password"
+            autocomplete="new-password"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn-auth-primary" id="btn-signup">
+          <div class="auth-spinner" aria-hidden="true"></div>
+          <span class="btn-label">Create Account</span>
+        </button>
+      </form>
+
+      <p class="form-hint" style="text-align:center; margin-top: 12px;">
+        A confirmation email will be sent to verify your account.
+      </p>
+    </div>
+
+    <!-- ── MAGIC LINK PANEL ── -->
+    <div class="auth-panel" id="panel-magic" role="tabpanel">
+
+      <div class="auth-message" id="magic-msg" role="alert" aria-live="polite"></div>
+
+      <form id="form-magic" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="magic-email">Email Address</label>
+          <input
+            id="magic-email"
+            type="email"
+            class="form-input"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+        <button type="submit" class="btn-auth-primary" id="btn-send-magic">
+          <div class="auth-spinner" aria-hidden="true"></div>
+          <span class="btn-label">Send Magic Link</span>
+        </button>
+      </form>
+
+      <div class="auth-footer-links">
+        <button class="auth-text-link" id="btn-back-from-magic">← Back to Sign In</button>
+      </div>
+    </div>
+
+    <!-- ── FORGOT PASSWORD PANEL ── -->
+    <div class="auth-panel" id="panel-forgot" role="tabpanel">
+
+      <div class="auth-message" id="forgot-msg" role="alert" aria-live="polite"></div>
+
+      <form id="form-forgot" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="forgot-email">Your email address</label>
+          <input
+            id="forgot-email"
+            type="email"
+            class="form-input"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+        <button type="submit" class="btn-auth-primary" id="btn-reset-password">
+          <div class="auth-spinner" aria-hidden="true"></div>
+          <span class="btn-label">Send Reset Link</span>
+        </button>
+      </form>
+
+      <div class="auth-footer-links">
+        <button class="auth-text-link" id="btn-back-from-forgot">← Back to Sign In</button>
+      </div>
+    </div>
+
+  </div><!-- /auth-card -->
+</main>
+
+<script type="module" src="js/auth-page.js"></script>
+</body>
+</html>

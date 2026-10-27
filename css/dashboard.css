@@ -1,5 +1,6 @@
 /* ==========================================================================
    Comhard TaskFlow - Main Dashboard Header & Filter Toolbar Styles
+   Monochrome Black & White - Zero Blue Color Accents
    ========================================================================== */
 
 .main-content {
@@ -63,12 +64,12 @@
 
 .task-count-badge {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--text-tertiary);
+  font-weight: 600;
+  color: var(--text-secondary);
   background-color: var(--bg-surface-elevated);
   padding: 4px 10px;
   border-radius: var(--radius-pill);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
 }
 
 /* Header Actions: Search, Add, Theme */
@@ -112,6 +113,7 @@
 
 .search-input:focus {
   background-color: var(--bg-surface);
+  border-color: var(--border-highlight);
 }
 
 .search-kbd-hint {
@@ -155,15 +157,14 @@
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
   background-color: var(--bg-surface-elevated);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   transition: all var(--transition-fast);
 }
 
 .theme-toggle-btn:hover {
   background-color: var(--bg-surface-hover);
-  color: var(--text-primary);
   border-color: var(--border-highlight);
 }
 
@@ -183,7 +184,7 @@
   flex-wrap: wrap;
 }
 
-/* View Selector (Segmented Pill Control) */
+/* View Selector (Segmented Control) */
 .view-selector-group {
   display: inline-flex;
   background-color: var(--bg-surface-elevated);
@@ -216,14 +217,14 @@
 }
 
 .view-btn.active {
-  background-color: var(--bg-surface);
-  color: var(--primary);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-subtle);
+  background-color: var(--primary);
+  color: var(--primary-text);
+  box-shadow: 0 1px 3px var(--primary-glow);
+  border: 1px solid var(--primary);
 }
 
 .view-btn.active svg {
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 /* Filter Controls Group */
@@ -238,17 +239,16 @@
   height: 34px;
   padding: 0 28px 0 10px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
   background-color: var(--bg-surface-elevated);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   transition: all var(--transition-fast);
 }
 
 .filter-select:hover {
   border-color: var(--border-highlight);
-  color: var(--text-primary);
 }
 
 .sort-group {
@@ -266,7 +266,7 @@
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
   background-color: var(--bg-surface-elevated);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-size: 11px;
   font-weight: 700;
   transition: all var(--transition-fast);
@@ -274,7 +274,7 @@
 
 .btn-sort-order:hover {
   background-color: var(--bg-surface-hover);
-  color: var(--text-primary);
+  border-color: var(--border-highlight);
 }
 
 .btn-sort-order svg {
@@ -291,10 +291,10 @@
   padding: 0 12px;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
-  color: var(--text-tertiary);
+  color: var(--text-muted);
   font-size: 12px;
   font-weight: 600;
-  opacity: 0.6;
+  opacity: 0.5;
   pointer-events: none;
   transition: all var(--transition-fast);
 }
@@ -307,13 +307,14 @@
 .btn-clear-filters.is-active {
   opacity: 1;
   pointer-events: auto;
-  color: var(--primary);
-  background-color: var(--primary-subtle);
-  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--primary-text);
+  background-color: var(--primary);
+  border-color: var(--primary);
 }
 
 .btn-clear-filters.is-active:hover {
-  background-color: rgba(99, 102, 241, 0.2);
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 
 .active-filter-badge {
@@ -323,10 +324,10 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: var(--primary);
-  color: #ffffff;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 /* -------------------------------------------------------------
