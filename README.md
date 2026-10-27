@@ -1,4 +1,4 @@
-# Comhard TaskFlow — Stage 2
+# Comhard TaskFlow
 
 A modern, full-stack personal task management dashboard built with **HTML, Vanilla CSS, and JavaScript ES modules**, powered by **Supabase** for authentication and persistent PostgreSQL storage.
 
